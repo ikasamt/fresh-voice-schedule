@@ -49,38 +49,38 @@ export default function AnimatedScheduleItem({
   };
 
   const formatRelativeTime = (date: Date | null) => {
-    if (!date) return "未定";
+    if (!date) return { main: "未定", sub: "", isPast: false };
     
     const now = new Date();
     const diff = date.getTime() - now.getTime();
+    const absDiff = Math.abs(diff);
+    const isPast = diff < 0;
     
-    if (diff < 0) {
-      // 過去の場合
-      const absDiff = Math.abs(diff);
-      const hours = Math.floor(absDiff / (1000 * 60 * 60));
-      const minutes = Math.floor((absDiff % (1000 * 60 * 60)) / (1000 * 60));
-      
-      if (hours > 24) {
-        const days = Math.floor(hours / 24);
-        return `${days}日前`;
-      } else if (hours > 0) {
-        return `${hours}時間${minutes}分前`;
-      } else {
-        return `${minutes}分前`;
-      }
+    const days = Math.floor(absDiff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((absDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((absDiff % (1000 * 60 * 60)) / (1000 * 60));
+    
+    if (days > 0) {
+      // 24時間以上 - 日数のみ表示
+      return { 
+        main: `${isPast ? '-' : ''}${days}`,
+        sub: 'd',
+        isPast 
+      };
+    } else if (hours > 0) {
+      // 1時間以上 - 時間のみ表示
+      return { 
+        main: `${isPast ? '-' : ''}${hours}`,
+        sub: 'h',
+        isPast 
+      };
     } else {
-      // 未来の場合
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      
-      if (hours > 24) {
-        const days = Math.floor(hours / 24);
-        return `あと${days}日`;
-      } else if (hours > 0) {
-        return `あと${hours}時間${minutes}分`;
-      } else {
-        return `あと${minutes}分`;
-      }
+      // 1時間未満 - 分のみ表示
+      return { 
+        main: `${isPast ? '-' : ''}${minutes}`,
+        sub: 'm',
+        isPast 
+      };
     }
   };
 
@@ -132,14 +132,18 @@ export default function AnimatedScheduleItem({
             e.stopPropagation();
             if (!isCompleting) onEdit("date");
           }}
-          class="flex-shrink-0"
+          class="flex-shrink-0 min-w-[60px]"
           disabled={isCompleting}
         >
-          {showRelativeTime ? (
-            <div class={`text-sm font-medium ${isOverdue && !schedule.isCompleted ? "text-red-500" : schedule.isCompleted ? "text-gray-400" : "text-gray-600"}`}>
-              {formatRelativeTime(schedule.scheduledDate)}
-            </div>
-          ) : (
+          {showRelativeTime ? (() => {
+            const relTime = formatRelativeTime(schedule.scheduledDate);
+            return (
+              <div class={`flex items-baseline ${relTime.isPast && !schedule.isCompleted ? "text-red-500" : schedule.isCompleted ? "text-gray-400" : "text-gray-600"}`}>
+                <span class="text-xl font-bold">{relTime.main}</span>
+                <span class="text-xs ml-0.5">{relTime.sub}</span>
+              </div>
+            );
+          })() : (
             <>
               <div class={`text-sm font-medium ${isOverdue && !schedule.isCompleted ? "text-red-500" : schedule.isCompleted ? "text-gray-400" : "text-gray-600"}`}>
                 {formatDate(schedule.scheduledDate)}
