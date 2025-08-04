@@ -103,7 +103,7 @@ export default function TimelineScreen({ user }: Props) {
     <div class="min-h-screen bg-gray-100">
       {/* Header */}
       <header class="bg-white shadow-sm">
-        <div class="max-w-2xl mx-auto px-4 sm:px-6">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6">
           <div class="flex items-center justify-between h-16">
             <h1 class="text-xl font-bold text-gray-900">スケジュール</h1>
             <div class="flex items-center gap-2">
@@ -140,7 +140,7 @@ export default function TimelineScreen({ user }: Props) {
       </header>
 
       {/* Schedule List */}
-      <main class="max-w-2xl mx-auto px-4 sm:px-6 py-6">
+      <main class="max-w-4xl mx-auto px-4 sm:px-6 py-6">
         {filteredSchedules.length === 0 ? (
           <div class="text-center py-12">
             <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
