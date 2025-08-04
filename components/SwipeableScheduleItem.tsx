@@ -46,8 +46,16 @@ export default function SwipeableScheduleItem({
 
   const handleTouchMove = (e: TouchEvent) => {
     if (!isSwiping) return;
-    setTouchEnd(e.targetTouches[0].clientX);
-    const diff = e.targetTouches[0].clientX - touchStart;
+    
+    const currentX = e.targetTouches[0].clientX;
+    setTouchEnd(currentX);
+    const diff = currentX - touchStart;
+    
+    // Prevent vertical scroll if horizontal swipe is detected
+    if (Math.abs(diff) > 10) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     
     // Limit swipe distance
     const maxSwipe = window.innerWidth * 0.4;
@@ -119,10 +127,10 @@ export default function SwipeableScheduleItem({
     const container = containerRef.current;
     if (!container) return;
 
-    // Touch events
-    container.addEventListener('touchstart', handleTouchStart, { passive: false });
+    // Touch events with passive: false for touchmove to prevent pull-to-refresh
+    container.addEventListener('touchstart', handleTouchStart, { passive: true });
     container.addEventListener('touchmove', handleTouchMove, { passive: false });
-    container.addEventListener('touchend', handleTouchEnd);
+    container.addEventListener('touchend', handleTouchEnd, { passive: true });
 
     // Mouse events
     container.addEventListener('mousedown', handleMouseDown);
@@ -188,7 +196,10 @@ export default function SwipeableScheduleItem({
         `}
         style={{ 
           transform: `translateX(${translateX}px)`,
-          transition: isSwiping ? 'none' : 'transform 0.2s ease-out'
+          transition: isSwiping ? 'none' : 'transform 0.2s ease-out',
+          touchAction: 'pan-y',
+          userSelect: 'none',
+          WebkitUserSelect: 'none'
         }}
       >
         <div class="flex items-center gap-4 pointer-events-none select-none">
