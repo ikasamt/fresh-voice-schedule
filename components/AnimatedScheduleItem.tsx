@@ -132,28 +132,28 @@ export default function AnimatedScheduleItem({
             e.stopPropagation();
             if (!isCompleting) onEdit("date");
           }}
-          class="flex-shrink-0 w-[80px] flex items-center justify-end"
+          class="flex-shrink-0 w-[80px] h-[40px] flex flex-col items-end justify-center"
           disabled={isCompleting}
         >
           {showRelativeTime ? (() => {
             const relTime = formatRelativeTime(schedule.scheduledDate);
             return (
               <div class={`flex items-baseline ${relTime.isPast && !schedule.isCompleted ? "text-red-500" : schedule.isCompleted ? "text-gray-400" : "text-gray-600"}`}>
-                <span class="text-lg font-bold">{relTime.main}</span>
-                <span class="text-xs ml-0.5">{relTime.sub}</span>
+                <span class="text-lg font-bold leading-none">{relTime.main}</span>
+                <span class="text-xs ml-0.5 leading-none">{relTime.sub}</span>
               </div>
             );
           })() : (
-            <div class="text-right">
-              <div class={`text-sm font-medium ${isOverdue && !schedule.isCompleted ? "text-red-500" : schedule.isCompleted ? "text-gray-400" : "text-gray-600"}`}>
+            <>
+              <div class={`text-sm font-medium leading-tight ${isOverdue && !schedule.isCompleted ? "text-red-500" : schedule.isCompleted ? "text-gray-400" : "text-gray-600"}`}>
                 {formatDate(schedule.scheduledDate)}
               </div>
               {schedule.scheduledDate && (
-                <div class={`text-xs ${isOverdue && !schedule.isCompleted ? "text-red-400" : "text-gray-400"}`}>
+                <div class={`text-xs leading-tight ${isOverdue && !schedule.isCompleted ? "text-red-400" : "text-gray-400"}`}>
                   {formatTime(schedule.scheduledDate)}
                 </div>
               )}
-            </div>
+            </>
           )}
         </button>
 
