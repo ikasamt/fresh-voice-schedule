@@ -38,7 +38,7 @@ export default function AnimatedScheduleItem({
     if (!date) return "未定";
     const month = date.getMonth() + 1;
     const day = date.getDate();
-    return `${month}月${day}日`;
+    return `${month}/${day}`;
   };
 
   const formatTime = (date: Date | null) => {
@@ -139,7 +139,7 @@ export default function AnimatedScheduleItem({
             const relTime = formatRelativeTime(schedule.scheduledDate);
             if (!relTime) {
               return (
-                <div class={`text-sm font-medium leading-tight ${schedule.isCompleted ? "text-gray-400" : "text-gray-600"}`}>
+                <div class={`text-lg font-bold leading-none ${schedule.isCompleted ? "text-gray-400" : "text-gray-600"}`}>
                   未定
                 </div>
               );
@@ -152,7 +152,7 @@ export default function AnimatedScheduleItem({
             );
           })() : (
             <>
-              <div class={`text-sm font-medium leading-tight ${isOverdue && !schedule.isCompleted ? "text-red-500" : schedule.isCompleted ? "text-gray-400" : "text-gray-600"}`}>
+              <div class={`text-lg font-bold leading-none ${isOverdue && !schedule.isCompleted ? "text-red-500" : schedule.isCompleted ? "text-gray-400" : "text-gray-600"}`}>
                 {formatDate(schedule.scheduledDate)}
               </div>
               {schedule.scheduledDate && (
