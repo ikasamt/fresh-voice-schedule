@@ -49,7 +49,7 @@ export default function AnimatedScheduleItem({
   };
 
   const formatRelativeTime = (date: Date | null) => {
-    if (!date) return { main: "未定", sub: "", isPast: false };
+    if (!date) return null;
     
     const now = new Date();
     const diff = date.getTime() - now.getTime();
@@ -137,6 +137,13 @@ export default function AnimatedScheduleItem({
         >
           {showRelativeTime ? (() => {
             const relTime = formatRelativeTime(schedule.scheduledDate);
+            if (!relTime) {
+              return (
+                <div class={`text-sm font-medium leading-tight ${schedule.isCompleted ? "text-gray-400" : "text-gray-600"}`}>
+                  未定
+                </div>
+              );
+            }
             return (
               <div class={`flex items-baseline ${relTime.isPast && !schedule.isCompleted ? "text-red-500" : schedule.isCompleted ? "text-gray-400" : "text-gray-600"}`}>
                 <span class="text-lg font-bold leading-none">{relTime.main}</span>
