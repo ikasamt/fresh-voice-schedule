@@ -9,8 +9,13 @@ export default function LoginScreen() {
     <div class="min-h-screen bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center p-4">
       <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
         <div class="text-center mb-8">
+          <img 
+            src="/logo.svg" 
+            alt="Voice Schedule" 
+            class="w-24 h-24 mx-auto mb-4 drop-shadow-lg"
+          />
           <h1 class="text-3xl font-bold text-gray-800 mb-2">Voice Schedule</h1>
-          <p class="text-gray-600">音声やテキストで簡単スケジュール管理</p>
+          <p class="text-gray-600">AIでかんたんスケジュール管理</p>
         </div>
 
         <div class="space-y-4">

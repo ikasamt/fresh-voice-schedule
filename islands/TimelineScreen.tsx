@@ -105,7 +105,14 @@ export default function TimelineScreen({ user }: Props) {
       <header class="bg-white shadow-sm">
         <div class="max-w-4xl mx-auto px-4 sm:px-6">
           <div class="flex items-center justify-between h-16">
-            <h1 class="text-xl font-bold text-gray-900">スケジュール</h1>
+            <div class="flex items-center gap-3">
+              <img 
+                src="/logo.svg" 
+                alt="Voice Schedule" 
+                class="w-10 h-10"
+              />
+              <h1 class="text-xl font-bold text-gray-900">スケジュール</h1>
+            </div>
             <div class="flex items-center gap-2">
               <button
                 onClick={() => setShowCompleted(!showCompleted)}
