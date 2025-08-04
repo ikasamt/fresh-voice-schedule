@@ -21,7 +21,7 @@ interface Props {
 export default function TimelineScreen({ user }: Props) {
   const [schedules, setSchedules] = useState<ScheduleItem[]>([]);
   const [showCompleted, setShowCompleted] = useState(false);
-  const [showRelativeTime, setShowRelativeTime] = useState(false);
+  const [showRelativeTime, setShowRelativeTime] = useState(true);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingSchedule, setEditingSchedule] = useState<ScheduleItem | null>(null);
