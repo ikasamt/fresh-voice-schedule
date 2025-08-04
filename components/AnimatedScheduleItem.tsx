@@ -171,43 +171,63 @@ export default function AnimatedScheduleItem({
               {schedule.title}
             </div>
           </button>
-          <div class="flex items-center gap-3 mt-2">
-            {schedule.location && (
-              <div class="flex items-center gap-1 text-xs text-gray-500">
-                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                <span>{schedule.location}</span>
-              </div>
-            )}
-            {schedule.estimatedDuration && (
-              <div class="flex items-center gap-1 text-xs text-gray-400">
-                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>{schedule.estimatedDuration}分</span>
-              </div>
-            )}
-          </div>
+          {(schedule.location || schedule.estimatedDuration) && (
+            <div class="flex items-center gap-3 mt-2">
+              {schedule.estimatedDuration && (
+                <div class="flex items-center gap-1 text-xs text-gray-400">
+                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>{schedule.estimatedDuration}分</span>
+                </div>
+              )}
+              {schedule.location && (
+                <div class="flex items-center gap-1 text-xs text-gray-500">
+                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <span class="truncate max-w-[150px]">{schedule.location}</span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
-        {/* Delete button for completed items */}
-        {schedule.isCompleted && !isCompleting && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              if (confirm(`「${schedule.title}」を削除しますか？`)) {
-                onDelete();
-              }
-            }}
-            class="flex-shrink-0 p-2 hover:bg-red-50 rounded-lg transition-colors"
-          >
-            <svg class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-          </button>
-        )}
+        <div class="flex items-center gap-2">
+          {/* Map button for items with location */}
+          {schedule.location && (
+            <a
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(schedule.location)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              class="flex-shrink-0 p-2 hover:bg-blue-50 rounded-lg transition-colors"
+              title={`Google Mapsで「${schedule.location}」を開く`}
+            >
+              <svg class="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+              </svg>
+            </a>
+          )}
+
+          {/* Delete button for completed items */}
+          {schedule.isCompleted && !isCompleting && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (confirm(`「${schedule.title}」を削除しますか？`)) {
+                  onDelete();
+                }
+              }}
+              class="flex-shrink-0 p-2 hover:bg-red-50 rounded-lg transition-colors"
+            >
+              <svg class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
