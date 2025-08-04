@@ -10,7 +10,7 @@ import {
   type ScheduleItem 
 } from "../utils/firebase.ts";
 import { parseScheduleText, parseScheduleFromImage } from "../utils/gemini.ts";
-import SwipeableScheduleItem from "../components/SwipeableScheduleItem.tsx";
+import AnimatedScheduleItem from "../components/AnimatedScheduleItem.tsx";
 import AddScheduleModal from "./AddScheduleModal.tsx";
 import QuickEditDialog from "./QuickEditDialog.tsx";
 
@@ -44,7 +44,7 @@ export default function TimelineScreen({ user }: Props) {
   };
 
   const handleDelete = async (schedule: ScheduleItem) => {
-    if (schedule.id && confirm(`「${schedule.title}」を削除しますか？`)) {
+    if (schedule.id) {
       await deleteSchedule(schedule.id);
     }
   };
@@ -137,7 +137,7 @@ export default function TimelineScreen({ user }: Props) {
         ) : (
           <div class="space-y-3">
             {filteredSchedules.map((schedule) => (
-              <SwipeableScheduleItem
+              <AnimatedScheduleItem
                 key={schedule.id}
                 schedule={schedule}
                 onToggleComplete={() => handleToggleComplete(schedule)}
