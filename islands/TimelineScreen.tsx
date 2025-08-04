@@ -106,30 +106,33 @@ export default function TimelineScreen({ user }: Props) {
         <div class="max-w-2xl mx-auto px-4 sm:px-6">
           <div class="flex items-center justify-between h-16">
             <h1 class="text-xl font-bold text-gray-900">スケジュール</h1>
-            <div class="flex items-center gap-3">
-              <label class="flex items-center gap-2 cursor-pointer">
-                <span class="text-sm text-gray-600">完了済み</span>
-                <input
-                  type="checkbox"
-                  checked={showCompleted}
-                  onChange={(e) => setShowCompleted((e.target as HTMLInputElement).checked)}
-                  class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                />
-              </label>
-              <label class="flex items-center gap-2 cursor-pointer">
-                <span class="text-sm text-gray-600">残り時間</span>
-                <input
-                  type="checkbox"
-                  checked={showRelativeTime}
-                  onChange={(e) => setShowRelativeTime((e.target as HTMLInputElement).checked)}
-                  class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                />
-              </label>
+            <div class="flex items-center gap-2">
+              <button
+                onClick={() => setShowCompleted(!showCompleted)}
+                class={`p-2 rounded-lg transition-colors ${showCompleted ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:text-gray-600'}`}
+                title="完了済みを表示"
+              >
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </button>
+              <button
+                onClick={() => setShowRelativeTime(!showRelativeTime)}
+                class={`p-2 rounded-lg transition-colors ${showRelativeTime ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:text-gray-600'}`}
+                title="残り時間表示"
+              >
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </button>
               <button
                 onClick={handleSignOut}
-                class="text-sm text-gray-500 hover:text-gray-700"
+                class="p-2 text-gray-400 hover:text-gray-600 rounded-lg transition-colors"
+                title="ログアウト"
               >
-                ログアウト
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
               </button>
             </div>
           </div>
