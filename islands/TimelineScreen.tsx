@@ -10,7 +10,7 @@ import {
   type ScheduleItem 
 } from "../utils/firebase.ts";
 import { parseScheduleText, parseScheduleFromImage } from "../utils/gemini.ts";
-import ScheduleItemComponent from "../components/ScheduleItemComponent.tsx";
+import SwipeableScheduleItem from "../components/SwipeableScheduleItem.tsx";
 import AddScheduleModal from "./AddScheduleModal.tsx";
 import QuickEditDialog from "./QuickEditDialog.tsx";
 
@@ -137,7 +137,7 @@ export default function TimelineScreen({ user }: Props) {
         ) : (
           <div class="space-y-2">
             {filteredSchedules.map((schedule) => (
-              <ScheduleItemComponent
+              <SwipeableScheduleItem
                 key={schedule.id}
                 schedule={schedule}
                 onToggleComplete={() => handleToggleComplete(schedule)}
