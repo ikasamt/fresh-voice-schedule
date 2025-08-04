@@ -14,8 +14,7 @@ export default function AnimatedScheduleItem({
   onEdit,
   onDelete
 }: Props) {
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
+  const [isCompleting, setIsCompleting] = useState(false);
 
   const now = new Date();
   const isOverdue = schedule.scheduledDate && 
@@ -41,39 +40,25 @@ export default function AnimatedScheduleItem({
       // 完了済みの場合は未完了に戻す
       onToggleComplete();
     } else {
-      // 未完了の場合はアニメーションを開始
-      setIsDeleting(true);
+      // 未完了の場合はグレーアウトして完了
+      setIsCompleting(true);
       
-      // アニメーション後に完了フラグを立てる
+      // 少し遅延してから完了フラグを立てる
       setTimeout(() => {
-        setIsVisible(false);
-        setTimeout(() => {
-          onToggleComplete(); // 完了フラグを立てる
-          setIsDeleting(false);
-          setIsVisible(true);
-        }, 300);
-      }, 1500); // 1.5秒後に消え始める
+        onToggleComplete();
+        setIsCompleting(false);
+      }, 800);
     }
   };
-
-  useEffect(() => {
-    if (isDeleting) {
-      const timer = setTimeout(() => {
-        setIsVisible(false);
-      }, 1500);
-      return () => clearTimeout(timer);
-    }
-  }, [isDeleting]);
 
   return (
     <div
       class={`
         relative bg-white rounded-2xl shadow-md p-5 
-        transition-all duration-300 ease-out
+        transition-opacity duration-500 ease-out
         ${isOverdue && !schedule.isCompleted ? "bg-red-50" : ""}
-        ${schedule.isCompleted && !isDeleting ? "opacity-60" : ""}
-        ${isDeleting ? "opacity-60 scale-95" : ""}
-        ${!isVisible ? "opacity-0 scale-90 h-0 overflow-hidden" : ""}
+        ${schedule.isCompleted ? "opacity-60" : ""}
+        ${isCompleting ? "opacity-40" : ""}
       `}
     >
       <div class="flex items-start gap-4">
@@ -81,34 +66,25 @@ export default function AnimatedScheduleItem({
         <button
           onClick={handleCheckClick}
           class="flex-shrink-0 mt-0.5"
-          disabled={isDeleting}
+          disabled={isCompleting}
         >
-          <div class="relative">
-            {(schedule.isCompleted || isDeleting) ? (
-              <div class="relative">
-                <svg class="w-6 h-6 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                </svg>
-                {isDeleting && (
-                  <div class="absolute inset-0 flex items-center justify-center">
-                    <div class="w-6 h-6 border-2 border-blue-500 rounded-full animate-ping"></div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div class="w-6 h-6 border-2 border-gray-300 rounded-full hover:border-blue-400 transition-colors"></div>
-            )}
-          </div>
+          {(schedule.isCompleted || isCompleting) ? (
+            <svg class="w-6 h-6 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+            </svg>
+          ) : (
+            <div class="w-6 h-6 border-2 border-gray-300 rounded-full hover:border-blue-400 transition-colors"></div>
+          )}
         </button>
 
         {/* Date and Time */}
         <button
           onClick={(e) => {
             e.stopPropagation();
-            if (!isDeleting) onEdit("date");
+            if (!isCompleting) onEdit("date");
           }}
           class="flex-shrink-0"
-          disabled={isDeleting}
+          disabled={isCompleting}
         >
           <div class={`text-sm font-medium ${isOverdue && !schedule.isCompleted ? "text-red-500" : schedule.isCompleted ? "text-gray-400" : "text-gray-600"}`}>
             {formatDate(schedule.scheduledDate)}
@@ -125,10 +101,10 @@ export default function AnimatedScheduleItem({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              if (!isDeleting) onEdit("title");
+              if (!isCompleting) onEdit("title");
             }}
             class="text-left w-full"
-            disabled={isDeleting}
+            disabled={isCompleting}
           >
             <div class={`text-base ${schedule.isCompleted ? "line-through text-gray-400" : "text-gray-900"}`}>
               {schedule.title}
@@ -145,7 +121,7 @@ export default function AnimatedScheduleItem({
         </div>
 
         {/* Delete button for completed items */}
-        {schedule.isCompleted && !isDeleting && (
+        {schedule.isCompleted && !isCompleting && (
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -161,13 +137,6 @@ export default function AnimatedScheduleItem({
           </button>
         )}
       </div>
-
-      {/* Completion animation overlay */}
-      {isDeleting && (
-        <div class="absolute inset-0 bg-white bg-opacity-50 rounded-2xl flex items-center justify-center">
-          <div class="text-blue-500 font-medium animate-pulse">完了！</div>
-        </div>
-      )}
     </div>
   );
 }
