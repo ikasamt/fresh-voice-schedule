@@ -6,6 +6,7 @@ export interface ParsedSchedule {
   title: string;
   scheduledDate: Date | null;
   estimatedDuration: number | null;
+  location: string | null;
   originalText: string;
 }
 
@@ -17,6 +18,7 @@ export async function parseScheduleText(text: string): Promise<ParsedSchedule> {
 1. タスク/イベントの内容
 2. 日時（あれば）
 3. 所要時間（あれば）
+4. 場所（あれば）- 駅名、施設名、店名、住所など場所に関する情報
 
 入力テキスト: "${text}"
 現在時刻: ${new Date().toISOString()}
@@ -25,7 +27,8 @@ export async function parseScheduleText(text: string): Promise<ParsedSchedule> {
 {
   "title": "タスクのタイトル",
   "scheduledDate": "ISO8601形式の日時（例：2024-01-20T15:00:00）またはnull",
-  "estimatedDurationMinutes": 所要時間（分）またはnull
+  "estimatedDurationMinutes": 所要時間（分）またはnull,
+  "location": "場所名またはnull"
 }
 `;
 
@@ -63,6 +66,7 @@ export async function parseScheduleText(text: string): Promise<ParsedSchedule> {
       title: parsed.title || text,
       scheduledDate: parsed.scheduledDate ? new Date(parsed.scheduledDate) : null,
       estimatedDuration: parsed.estimatedDurationMinutes || null,
+      location: parsed.location || null,
       originalText: text,
     };
   } catch (error) {
@@ -71,6 +75,7 @@ export async function parseScheduleText(text: string): Promise<ParsedSchedule> {
       title: text,
       scheduledDate: null,
       estimatedDuration: null,
+      location: null,
       originalText: text,
     };
   }
@@ -161,6 +166,12 @@ function parseJsonResponse(text: string): any {
     const durationMatch = text.match(/"estimatedDurationMinutes"\s*:\s*(\d+)/);
     if (durationMatch) {
       result.estimatedDurationMinutes = parseInt(durationMatch[1]);
+    }
+    
+    // Extract location
+    const locationMatch = text.match(/"location"\s*:\s*"([^"]+)"/);
+    if (locationMatch && locationMatch[1] !== "null") {
+      result.location = locationMatch[1];
     }
     
     return result;

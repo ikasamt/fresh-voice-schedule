@@ -74,6 +74,7 @@ export default function TimelineScreen({ user }: Props) {
         title: parsed.title,
         scheduledDate: parsed.scheduledDate,
         estimatedDuration: parsed.estimatedDuration,
+        location: parsed.location,
         originalText: parsed.originalText,
         isCompleted: false,
         isFromImage: !!imageData,

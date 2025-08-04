@@ -66,6 +66,7 @@ export interface ScheduleItem {
   title: string;
   scheduledDate: Date | null;
   estimatedDuration: number | null;
+  location?: string | null;
   originalText: string;
   isCompleted: boolean;
   isFromImage?: boolean;
