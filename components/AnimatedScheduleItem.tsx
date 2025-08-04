@@ -132,14 +132,14 @@ export default function AnimatedScheduleItem({
             e.stopPropagation();
             if (!isCompleting) onEdit("date");
           }}
-          class="flex-shrink-0 w-[75px]"
+          class="flex-shrink-0 w-[80px] flex items-center justify-end"
           disabled={isCompleting}
         >
           {showRelativeTime ? (() => {
             const relTime = formatRelativeTime(schedule.scheduledDate);
             return (
-              <div class={`flex items-baseline justify-end ${relTime.isPast && !schedule.isCompleted ? "text-red-500" : schedule.isCompleted ? "text-gray-400" : "text-gray-600"}`}>
-                <span class="text-xl font-bold">{relTime.main}</span>
+              <div class={`flex items-baseline ${relTime.isPast && !schedule.isCompleted ? "text-red-500" : schedule.isCompleted ? "text-gray-400" : "text-gray-600"}`}>
+                <span class="text-lg font-bold">{relTime.main}</span>
                 <span class="text-xs ml-0.5">{relTime.sub}</span>
               </div>
             );
@@ -149,7 +149,7 @@ export default function AnimatedScheduleItem({
                 {formatDate(schedule.scheduledDate)}
               </div>
               {schedule.scheduledDate && (
-                <div class={`text-xs ${isOverdue && !schedule.isCompleted ? "text-red-400" : "text-gray-400"} mt-1`}>
+                <div class={`text-xs ${isOverdue && !schedule.isCompleted ? "text-red-400" : "text-gray-400"}`}>
                   {formatTime(schedule.scheduledDate)}
                 </div>
               )}
