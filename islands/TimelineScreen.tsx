@@ -142,7 +142,6 @@ export default function TimelineScreen({ user }: Props) {
                 schedule={schedule}
                 onToggleComplete={() => handleToggleComplete(schedule)}
                 onEdit={(field) => handleEdit(schedule, field)}
-                onDelete={() => handleDelete(schedule)}
               />
             ))}
           </div>

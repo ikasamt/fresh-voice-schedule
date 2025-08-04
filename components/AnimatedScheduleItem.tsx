@@ -5,14 +5,12 @@ interface Props {
   schedule: ScheduleItem;
   onToggleComplete: () => void;
   onEdit: (field: "title" | "date") => void;
-  onDelete: () => void;
 }
 
 export default function AnimatedScheduleItem({ 
   schedule, 
   onToggleComplete, 
-  onEdit, 
-  onDelete 
+  onEdit
 }: Props) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
@@ -44,14 +42,13 @@ export default function AnimatedScheduleItem({
       // 未完了の場合はアニメーションを開始
       setIsDeleting(true);
       
-      // アニメーション後に完了フラグを立てて削除
+      // アニメーション後に完了フラグを立てる
       setTimeout(() => {
         setIsVisible(false);
         setTimeout(() => {
           onToggleComplete(); // 完了フラグを立てる
-          setTimeout(() => {
-            onDelete(); // その後削除
-          }, 100);
+          setIsDeleting(false);
+          setIsVisible(true);
         }, 300);
       }, 1500); // 1.5秒後に消え始める
     }
@@ -146,10 +143,10 @@ export default function AnimatedScheduleItem({
         </div>
       </div>
 
-      {/* Delete animation overlay */}
+      {/* Completion animation overlay */}
       {isDeleting && (
         <div class="absolute inset-0 bg-white bg-opacity-50 rounded-2xl flex items-center justify-center">
-          <div class="text-blue-500 font-medium animate-pulse">完了しました</div>
+          <div class="text-blue-500 font-medium animate-pulse">完了！</div>
         </div>
       )}
     </div>
