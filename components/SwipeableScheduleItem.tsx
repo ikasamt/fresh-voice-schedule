@@ -59,7 +59,13 @@ export default function SwipeableScheduleItem({
     
     // Limit swipe distance
     const maxSwipe = window.innerWidth * 0.4;
-    const limitedDiff = Math.max(-maxSwipe, Math.min(maxSwipe, diff));
+    let limitedDiff = Math.max(-maxSwipe, Math.min(maxSwipe, diff));
+    
+    // Only allow left swipe (delete) for completed items
+    if (!schedule.isCompleted && limitedDiff < 0) {
+      limitedDiff = 0;
+    }
+    
     setTranslateX(limitedDiff);
   };
 
@@ -72,8 +78,8 @@ export default function SwipeableScheduleItem({
     if (swipeDistance > threshold) {
       // Swipe right - toggle complete
       onToggleComplete();
-    } else if (swipeDistance < -threshold) {
-      // Swipe left - delete
+    } else if (swipeDistance < -threshold && schedule.isCompleted) {
+      // Swipe left - delete (only for completed items)
       if (confirm(`「${schedule.title}」を削除しますか？`)) {
         onDelete();
       }
@@ -99,7 +105,13 @@ export default function SwipeableScheduleItem({
     const diff = e.clientX - touchStart;
     
     const maxSwipe = window.innerWidth * 0.4;
-    const limitedDiff = Math.max(-maxSwipe, Math.min(maxSwipe, diff));
+    let limitedDiff = Math.max(-maxSwipe, Math.min(maxSwipe, diff));
+    
+    // Only allow left swipe (delete) for completed items
+    if (!schedule.isCompleted && limitedDiff < 0) {
+      limitedDiff = 0;
+    }
+    
     setTranslateX(limitedDiff);
   };
 
@@ -111,7 +123,7 @@ export default function SwipeableScheduleItem({
 
     if (swipeDistance > threshold) {
       onToggleComplete();
-    } else if (swipeDistance < -threshold) {
+    } else if (swipeDistance < -threshold && schedule.isCompleted) {
       if (confirm(`「${schedule.title}」を削除しますか？`)) {
         onDelete();
       }
@@ -172,18 +184,20 @@ export default function SwipeableScheduleItem({
         </div>
       </div>
 
-      {/* Right background (Delete) */}
-      <div 
-        class="absolute inset-0 bg-red-500 flex items-center justify-end px-6"
-        style={{ opacity: rightOpacity }}
-      >
-        <div class="flex items-center gap-2 text-white">
-          <span class="font-medium text-lg">削除</span>
-          <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-          </svg>
+      {/* Right background (Delete) - Only show for completed items */}
+      {schedule.isCompleted && (
+        <div 
+          class="absolute inset-0 bg-red-500 flex items-center justify-end px-6"
+          style={{ opacity: rightOpacity }}
+        >
+          <div class="flex items-center gap-2 text-white">
+            <span class="font-medium text-lg">削除</span>
+            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Main content */}
       <div
