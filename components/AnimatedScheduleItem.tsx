@@ -3,6 +3,7 @@ import { type ScheduleItem } from "../utils/firebase.ts";
 
 interface Props {
   schedule: ScheduleItem;
+  showRelativeTime?: boolean;
   onToggleComplete: () => void;
   onEdit: (field: "title" | "date") => void;
   onDelete: () => void;
@@ -10,11 +11,23 @@ interface Props {
 
 export default function AnimatedScheduleItem({ 
   schedule, 
+  showRelativeTime = false,
   onToggleComplete, 
   onEdit,
   onDelete
 }: Props) {
   const [isCompleting, setIsCompleting] = useState(false);
+  const [, setRefresh] = useState(0);
+
+  useEffect(() => {
+    if (showRelativeTime) {
+      // 残り時間表示の場合は1分ごとに更新
+      const interval = setInterval(() => {
+        setRefresh(prev => prev + 1);
+      }, 60000);
+      return () => clearInterval(interval);
+    }
+  }, [showRelativeTime]);
 
   const now = new Date();
   const isOverdue = schedule.scheduledDate && 
@@ -33,6 +46,42 @@ export default function AnimatedScheduleItem({
     const hours = date.getHours().toString().padStart(2, "0");
     const minutes = date.getMinutes().toString().padStart(2, "0");
     return `${hours}:${minutes}`;
+  };
+
+  const formatRelativeTime = (date: Date | null) => {
+    if (!date) return "未定";
+    
+    const now = new Date();
+    const diff = date.getTime() - now.getTime();
+    
+    if (diff < 0) {
+      // 過去の場合
+      const absDiff = Math.abs(diff);
+      const hours = Math.floor(absDiff / (1000 * 60 * 60));
+      const minutes = Math.floor((absDiff % (1000 * 60 * 60)) / (1000 * 60));
+      
+      if (hours > 24) {
+        const days = Math.floor(hours / 24);
+        return `${days}日前`;
+      } else if (hours > 0) {
+        return `${hours}時間${minutes}分前`;
+      } else {
+        return `${minutes}分前`;
+      }
+    } else {
+      // 未来の場合
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      
+      if (hours > 24) {
+        const days = Math.floor(hours / 24);
+        return `あと${days}日`;
+      } else if (hours > 0) {
+        return `あと${hours}時間${minutes}分`;
+      } else {
+        return `あと${minutes}分`;
+      }
+    }
   };
 
   const handleCheckClick = () => {
@@ -86,13 +135,21 @@ export default function AnimatedScheduleItem({
           class="flex-shrink-0"
           disabled={isCompleting}
         >
-          <div class={`text-sm font-medium ${isOverdue && !schedule.isCompleted ? "text-red-500" : schedule.isCompleted ? "text-gray-400" : "text-gray-600"}`}>
-            {formatDate(schedule.scheduledDate)}
-          </div>
-          {schedule.scheduledDate && (
-            <div class={`text-xs ${isOverdue && !schedule.isCompleted ? "text-red-400" : "text-gray-400"} mt-1`}>
-              {formatTime(schedule.scheduledDate)}
+          {showRelativeTime ? (
+            <div class={`text-sm font-medium ${isOverdue && !schedule.isCompleted ? "text-red-500" : schedule.isCompleted ? "text-gray-400" : "text-gray-600"}`}>
+              {formatRelativeTime(schedule.scheduledDate)}
             </div>
+          ) : (
+            <>
+              <div class={`text-sm font-medium ${isOverdue && !schedule.isCompleted ? "text-red-500" : schedule.isCompleted ? "text-gray-400" : "text-gray-600"}`}>
+                {formatDate(schedule.scheduledDate)}
+              </div>
+              {schedule.scheduledDate && (
+                <div class={`text-xs ${isOverdue && !schedule.isCompleted ? "text-red-400" : "text-gray-400"} mt-1`}>
+                  {formatTime(schedule.scheduledDate)}
+                </div>
+              )}
+            </>
           )}
         </button>
 

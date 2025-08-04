@@ -21,6 +21,7 @@ interface Props {
 export default function TimelineScreen({ user }: Props) {
   const [schedules, setSchedules] = useState<ScheduleItem[]>([]);
   const [showCompleted, setShowCompleted] = useState(false);
+  const [showRelativeTime, setShowRelativeTime] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingSchedule, setEditingSchedule] = useState<ScheduleItem | null>(null);
@@ -114,6 +115,15 @@ export default function TimelineScreen({ user }: Props) {
                   class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                 />
               </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <span class="text-sm text-gray-600">残り時間</span>
+                <input
+                  type="checkbox"
+                  checked={showRelativeTime}
+                  onChange={(e) => setShowRelativeTime((e.target as HTMLInputElement).checked)}
+                  class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                />
+              </label>
               <button
                 onClick={handleSignOut}
                 class="text-sm text-gray-500 hover:text-gray-700"
@@ -140,6 +150,7 @@ export default function TimelineScreen({ user }: Props) {
               <AnimatedScheduleItem
                 key={schedule.id}
                 schedule={schedule}
+                showRelativeTime={showRelativeTime}
                 onToggleComplete={() => handleToggleComplete(schedule)}
                 onEdit={(field) => handleEdit(schedule, field)}
                 onDelete={() => handleDelete(schedule)}
