@@ -41,15 +41,17 @@ export default function AnimatedScheduleItem({
       // 完了済みの場合は未完了に戻す
       onToggleComplete();
     } else {
-      // 未完了の場合は完了にしてから削除アニメーション
-      onToggleComplete();
+      // 未完了の場合はアニメーションを開始
       setIsDeleting(true);
       
-      // アニメーション後に削除
+      // アニメーション後に完了フラグを立てて削除
       setTimeout(() => {
         setIsVisible(false);
         setTimeout(() => {
-          onDelete();
+          onToggleComplete(); // 完了フラグを立てる
+          setTimeout(() => {
+            onDelete(); // その後削除
+          }, 100);
         }, 300);
       }, 1500); // 1.5秒後に消え始める
     }
@@ -80,9 +82,10 @@ export default function AnimatedScheduleItem({
         <button
           onClick={handleCheckClick}
           class="flex-shrink-0 mt-0.5"
+          disabled={isDeleting}
         >
           <div class="relative">
-            {schedule.isCompleted || isDeleting ? (
+            {(schedule.isCompleted || isDeleting) ? (
               <div class="relative">
                 <svg class="w-6 h-6 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
@@ -103,9 +106,10 @@ export default function AnimatedScheduleItem({
         <button
           onClick={(e) => {
             e.stopPropagation();
-            onEdit("date");
+            if (!isDeleting) onEdit("date");
           }}
           class="flex-shrink-0"
+          disabled={isDeleting}
         >
           <div class={`text-sm font-medium ${isOverdue && !schedule.isCompleted ? "text-red-500" : schedule.isCompleted ? "text-gray-400" : "text-gray-600"}`}>
             {formatDate(schedule.scheduledDate)}
@@ -122,9 +126,10 @@ export default function AnimatedScheduleItem({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onEdit("title");
+              if (!isDeleting) onEdit("title");
             }}
             class="text-left w-full"
+            disabled={isDeleting}
           >
             <div class={`text-base ${schedule.isCompleted ? "line-through text-gray-400" : "text-gray-900"}`}>
               {schedule.title}
