@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useState, useEffect } from "preact/hooks";
 import { type ScheduleItem } from "../utils/firebase.ts";
 
 interface Props {
@@ -15,6 +15,17 @@ export default function QuickEditDialog({ schedule, field, onSave, onClose }: Pr
       ? formatDateTimeLocal(schedule.scheduledDate)
       : formatDateTimeLocal(new Date())
   );
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   function formatDateTimeLocal(date: Date): string {
     const year = date.getFullYear();
