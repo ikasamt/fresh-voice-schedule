@@ -11,6 +11,7 @@ import {
 } from "../utils/firebase.ts";
 import { parseScheduleText, parseScheduleFromImage } from "../utils/gemini.ts";
 import AnimatedScheduleItem from "../components/AnimatedScheduleItem.tsx";
+import DraggableScheduleItem from "../components/DraggableScheduleItem.tsx";
 import AddScheduleModal from "./AddScheduleModal.tsx";
 import QuickEditDialog from "./QuickEditDialog.tsx";
 
@@ -27,6 +28,7 @@ export default function TimelineScreen({ user }: Props) {
   const [editingSchedule, setEditingSchedule] = useState<ScheduleItem | null>(null);
   const [editingField, setEditingField] = useState<"title" | "date" | null>(null);
   const [isCommandPressed, setIsCommandPressed] = useState(false);
+  const [parentIdForNewTask, setParentIdForNewTask] = useState<string | null>(null);
 
   useEffect(() => {
     const unsubscribe = subscribeToSchedules(user.uid, (data) => {
@@ -38,6 +40,18 @@ export default function TimelineScreen({ user }: Props) {
   }, [user.uid]);
 
   const filteredSchedules = schedules.filter(s => showCompleted || !s.isCompleted);
+  
+  // 親子関係を整理
+  const rootSchedules = filteredSchedules.filter(s => !s.parentId);
+  const childrenByParentId = filteredSchedules.reduce((acc, schedule) => {
+    if (schedule.parentId) {
+      if (!acc[schedule.parentId]) {
+        acc[schedule.parentId] = [];
+      }
+      acc[schedule.parentId].push(schedule);
+    }
+    return acc;
+  }, {} as Record<string, ScheduleItem[]>);
 
   // Commandキーの検出
   useEffect(() => {
@@ -118,12 +132,48 @@ export default function TimelineScreen({ user }: Props) {
         originalText: parsed.originalText,
         isCompleted: false,
         isFromImage: !!imageData,
+        parentId: parentIdForNewTask,
       });
 
       setShowAddModal(false);
+      setParentIdForNewTask(null);
     } catch (error) {
       console.error("Failed to add schedule:", error);
       alert("スケジュールの追加に失敗しました");
+    }
+  };
+
+  const handleAddChild = (parentId: string) => {
+    setParentIdForNewTask(parentId);
+    setShowAddModal(true);
+  };
+
+  const handleMove = async (scheduleId: string, newParentId: string | null, position?: "before" | "after" | "child") => {
+    const movedSchedule = schedules.find(s => s.id === scheduleId);
+    if (!movedSchedule) return;
+
+    // 循環参照チェック
+    if (newParentId) {
+      let currentParent = schedules.find(s => s.id === newParentId);
+      while (currentParent) {
+        if (currentParent.id === scheduleId) {
+          alert("循環参照は作成できません");
+          return;
+        }
+        currentParent = schedules.find(s => s.id === currentParent?.parentId);
+      }
+    }
+
+    if (position === "child") {
+      // 子として追加
+      await updateSchedule(scheduleId, { parentId: newParentId });
+    } else if (position === "before" || position === "after") {
+      // 兄弟として追加（親を同じにする）
+      await updateSchedule(scheduleId, { parentId: newParentId });
+      // TODO: 順序の管理が必要な場合は、orderフィールドを追加して実装
+    } else {
+      // ルートレベルに移動
+      await updateSchedule(scheduleId, { parentId: null });
     }
   };
 
@@ -197,14 +247,18 @@ export default function TimelineScreen({ user }: Props) {
           </div>
         ) : (
           <div class="space-y-3">
-            {filteredSchedules.map((schedule, index) => (
-              <AnimatedScheduleItem
+            {rootSchedules.map((schedule, index) => (
+              <DraggableScheduleItem
                 key={schedule.id}
                 schedule={schedule}
+                children={childrenByParentId[schedule.id!] || []}
+                allSchedules={filteredSchedules}
                 showRelativeTime={showRelativeTime}
-                onToggleComplete={() => handleToggleComplete(schedule)}
-                onEdit={(field) => handleEdit(schedule, field)}
-                onDelete={() => handleDelete(schedule)}
+                onToggleComplete={handleToggleComplete}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onAddChild={handleAddChild}
+                onMove={handleMove}
                 shortcutNumber={isCommandPressed && !schedule.isCompleted && index < 9 ? index + 1 : undefined}
               />
             ))}

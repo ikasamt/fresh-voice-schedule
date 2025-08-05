@@ -70,6 +70,8 @@ export interface ScheduleItem {
   originalText: string;
   isCompleted: boolean;
   isFromImage?: boolean;
+  parentId?: string | null;  // 親タスクのID
+  hasChildren?: boolean;      // 子タスクを持っているかのフラグ（パフォーマンス最適化用）
   createdAt?: Date;
   updatedAt?: Date;
 }

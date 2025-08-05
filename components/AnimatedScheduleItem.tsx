@@ -8,6 +8,9 @@ interface Props {
   onEdit: (field: "title" | "date") => void;
   onDelete: () => void;
   shortcutNumber?: number;
+  isDragging?: boolean;
+  onDragStart?: (e: DragEvent) => void;
+  onDragEnd?: (e: DragEvent) => void;
 }
 
 export default function AnimatedScheduleItem({ 
@@ -16,7 +19,10 @@ export default function AnimatedScheduleItem({
   onToggleComplete, 
   onEdit,
   onDelete,
-  shortcutNumber
+  shortcutNumber,
+  isDragging = false,
+  onDragStart,
+  onDragEnd
 }: Props) {
   const [isCompleting, setIsCompleting] = useState(false);
   const [, setRefresh] = useState(0);
@@ -106,11 +112,16 @@ export default function AnimatedScheduleItem({
     <div
       class={`
         relative bg-white rounded-2xl shadow-md p-5 
-        transition-opacity duration-500 ease-out
+        transition-all duration-300 ease-out
         ${isOverdue && !schedule.isCompleted ? "bg-red-50" : ""}
         ${schedule.isCompleted ? "opacity-60" : ""}
         ${isCompleting ? "opacity-40" : ""}
+        ${isDragging ? "opacity-50 scale-95" : ""}
+        ${!schedule.isCompleted ? "cursor-move" : ""}
       `}
+      draggable={!schedule.isCompleted}
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
     >
       <div class="flex items-start gap-4">
         {/* Checkbox */}
