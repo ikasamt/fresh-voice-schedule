@@ -16,6 +16,7 @@ import * as $index from "./routes/index.tsx";
 import * as $AddModalCatalog from "./islands/AddModalCatalog.tsx";
 import * as $AddScheduleModal from "./islands/AddScheduleModal.tsx";
 import * as $App from "./islands/App.tsx";
+import * as $CatalogLayout from "./islands/CatalogLayout.tsx";
 import * as $Counter from "./islands/Counter.tsx";
 import * as $EditDialogCatalog from "./islands/EditDialogCatalog.tsx";
 import * as $LoginScreen from "./islands/LoginScreen.tsx";
@@ -42,6 +43,7 @@ const manifest = {
     "./islands/AddModalCatalog.tsx": $AddModalCatalog,
     "./islands/AddScheduleModal.tsx": $AddScheduleModal,
     "./islands/App.tsx": $App,
+    "./islands/CatalogLayout.tsx": $CatalogLayout,
     "./islands/Counter.tsx": $Counter,
     "./islands/EditDialogCatalog.tsx": $EditDialogCatalog,
     "./islands/LoginScreen.tsx": $LoginScreen,
