@@ -11,7 +11,7 @@ interface Props {
   onEdit: (schedule: ScheduleItem, field: "title" | "date") => void;
   onDelete: (schedule: ScheduleItem) => void;
   onAddChild: (parentId: string) => void;
-  onMove: (scheduleId: string, newParentId: string | null, position?: "before" | "after" | "child") => void;
+  onMove: (draggedId: string, targetId: string, position: "before" | "after" | "child") => void;
   shortcutNumber?: number;
   level?: number;
 }
@@ -88,10 +88,8 @@ export default function DraggableScheduleItem({
       return;
     }
 
-    if (dropPosition === "child") {
-      onMove(draggedId, schedule.id!);
-    } else if (dropPosition === "before" || dropPosition === "after") {
-      onMove(draggedId, schedule.parentId || null, dropPosition);
+    if (dropPosition) {
+      onMove(draggedId, schedule.id!, dropPosition);
     }
     
     setDropPosition(null);

@@ -148,33 +148,37 @@ export default function TimelineScreen({ user }: Props) {
     setShowAddModal(true);
   };
 
-  const handleMove = async (scheduleId: string, newParentId: string | null, position?: "before" | "after" | "child") => {
-    const movedSchedule = schedules.find(s => s.id === scheduleId);
-    if (!movedSchedule) return;
+  const handleMove = async (draggedId: string, targetId: string, position: "before" | "after" | "child") => {
+    const draggedSchedule = schedules.find(s => s.id === draggedId);
+    const targetSchedule = schedules.find(s => s.id === targetId);
+    if (!draggedSchedule || !targetSchedule) return;
 
-    // 循環参照チェック
-    if (newParentId) {
-      let currentParent = schedules.find(s => s.id === newParentId);
+    // 自分自身へのドロップは無視
+    if (draggedId === targetId) return;
+
+    let newParentId: string | null = null;
+
+    if (position === "child") {
+      // 子として追加
+      newParentId = targetId;
+      
+      // 循環参照チェック
+      let currentParent = targetSchedule;
       while (currentParent) {
-        if (currentParent.id === scheduleId) {
+        if (currentParent.id === draggedId) {
           alert("循環参照は作成できません");
           return;
         }
         currentParent = schedules.find(s => s.id === currentParent?.parentId);
       }
+    } else {
+      // before/after: ターゲットと同じ親を持つ（兄弟として配置）
+      newParentId = targetSchedule.parentId || null;
     }
 
-    if (position === "child") {
-      // 子として追加
-      await updateSchedule(scheduleId, { parentId: newParentId });
-    } else if (position === "before" || position === "after") {
-      // 兄弟として追加（親を同じにする）
-      await updateSchedule(scheduleId, { parentId: newParentId });
-      // TODO: 順序の管理が必要な場合は、orderフィールドを追加して実装
-    } else {
-      // ルートレベルに移動
-      await updateSchedule(scheduleId, { parentId: null });
-    }
+    // parentIdを更新
+    await updateSchedule(draggedId, { parentId: newParentId });
+    // TODO: before/afterの順序管理が必要な場合は、orderフィールドを追加して実装
   };
 
   const handleSignOut = async () => {
