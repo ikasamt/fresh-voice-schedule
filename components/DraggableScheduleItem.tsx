@@ -170,7 +170,7 @@ export default function DraggableScheduleItem({
             const grandChildren = allSchedules.filter(s => s.parentId === child.id);
             
             return (
-              <div key={child.id} class="relative">
+              <div key={child.id} class="relative mb-3">
                 {/* 横線 */}
                 <div class="absolute left-3 top-5 w-4 h-px bg-gray-200"></div>
                 
