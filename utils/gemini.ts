@@ -8,6 +8,7 @@ export interface ParsedSchedule {
   estimatedDuration: number | null;
   location: string | null;
   originalText: string;
+  subtasks?: ParsedSchedule[]; // サブタスクの配列
 }
 
 export async function parseScheduleText(text: string): Promise<ParsedSchedule> {
@@ -19,6 +20,7 @@ export async function parseScheduleText(text: string): Promise<ParsedSchedule> {
 2. 日時（あれば）
 3. 所要時間（あれば）
 4. 場所（あれば）- 駅名、施設名、店名、住所など場所に関する情報
+5. サブタスク（複数のステップや項目が含まれている場合は分解してください）
 
 入力テキスト: "${text}"
 現在時刻: ${new Date().toISOString()}
@@ -28,8 +30,21 @@ export async function parseScheduleText(text: string): Promise<ParsedSchedule> {
   "title": "タスクのタイトル",
   "scheduledDate": "ISO8601形式の日時（例：2024-01-20T15:00:00）またはnull",
   "estimatedDurationMinutes": 所要時間（分）またはnull,
-  "location": "場所名またはnull"
+  "location": "場所名またはnull",
+  "subtasks": [
+    {
+      "title": "サブタスク1",
+      "scheduledDate": "ISO8601形式の日時またはnull",
+      "estimatedDurationMinutes": 所要時間（分）またはnull,
+      "location": "場所名またはnull"
+    }
+  ]
 }
+
+注意：
+- 箇条書き、番号付きリスト、「〜して〜する」のような複数ステップがある場合は、subtasksに分解してください
+- サブタスクがない場合はsubtasksは空配列[]にしてください
+- 親タスクは全体を表す抽象的なタイトルにしてください
 `;
 
   try {
@@ -68,6 +83,13 @@ export async function parseScheduleText(text: string): Promise<ParsedSchedule> {
       estimatedDuration: parsed.estimatedDurationMinutes || null,
       location: parsed.location || null,
       originalText: text,
+      subtasks: parsed.subtasks ? parsed.subtasks.map((sub: any) => ({
+        title: sub.title,
+        scheduledDate: sub.scheduledDate ? new Date(sub.scheduledDate) : null,
+        estimatedDuration: sub.estimatedDurationMinutes || null,
+        location: sub.location || null,
+        originalText: sub.title,
+      })) : [],
     };
   } catch (error) {
     console.error("Gemini API error:", error);

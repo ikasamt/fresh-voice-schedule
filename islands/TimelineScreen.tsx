@@ -123,7 +123,8 @@ export default function TimelineScreen({ user }: Props) {
         ? await parseScheduleFromImage(imageData)
         : await parseScheduleText(text);
 
-      await addSchedule({
+      // 親タスクを作成
+      const parentResult = await addSchedule({
         userId: user.uid,
         title: parsed.title,
         scheduledDate: parsed.scheduledDate,
@@ -134,6 +135,23 @@ export default function TimelineScreen({ user }: Props) {
         isFromImage: !!imageData,
         parentId: parentIdForNewTask,
       });
+
+      // サブタスクがある場合は作成
+      if (parsed.subtasks && parsed.subtasks.length > 0) {
+        for (const subtask of parsed.subtasks) {
+          await addSchedule({
+            userId: user.uid,
+            title: subtask.title,
+            scheduledDate: subtask.scheduledDate,
+            estimatedDuration: subtask.estimatedDuration,
+            location: subtask.location,
+            originalText: subtask.originalText,
+            isCompleted: false,
+            isFromImage: false,
+            parentId: parentResult.id,
+          });
+        }
+      }
 
       setShowAddModal(false);
       setParentIdForNewTask(null);
