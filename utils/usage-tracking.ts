@@ -37,30 +37,39 @@ export async function trackGeminiUsage(userId: string) {
   const userUsageRef = doc(db, "user_usage", userId);
   const yearMonth = getCurrentYearMonth();
   
+  console.log("Tracking Gemini usage for user:", userId);
+  
   try {
     await updateDoc(userUsageRef, {
       geminiApiCalls: increment(1),
       [`monthlyUsage.${yearMonth}.geminiApiCalls`]: increment(1),
       lastUpdated: serverTimestamp()
     });
+    console.log("Updated existing usage document");
   } catch (error) {
+    console.log("Creating new usage document, error was:", error);
     // ドキュメントが存在しない場合は作成
-    await setDoc(userUsageRef, {
-      userId,
-      geminiApiCalls: 1,
-      firestoreReads: 0,
-      firestoreWrites: 0,
-      firestoreDeletes: 0,
-      monthlyUsage: {
-        [yearMonth]: {
-          geminiApiCalls: 1,
-          firestoreReads: 0,
-          firestoreWrites: 0,
-          firestoreDeletes: 0
-        }
-      },
-      lastUpdated: serverTimestamp()
-    });
+    try {
+      await setDoc(userUsageRef, {
+        userId,
+        geminiApiCalls: 1,
+        firestoreReads: 0,
+        firestoreWrites: 0,
+        firestoreDeletes: 0,
+        monthlyUsage: {
+          [yearMonth]: {
+            geminiApiCalls: 1,
+            firestoreReads: 0,
+            firestoreWrites: 0,
+            firestoreDeletes: 0
+          }
+        },
+        lastUpdated: serverTimestamp()
+      });
+      console.log("Created new usage document");
+    } catch (createError) {
+      console.error("Failed to create usage document:", createError);
+    }
   }
 }
 
@@ -118,17 +127,20 @@ export async function trackFirestoreUsage(
 
 // ユーザーの使用量を取得
 export async function getUserUsage(userId: string): Promise<UserUsage | null> {
+  console.log("Getting usage for user:", userId);
   const userUsageRef = doc(db, "user_usage", userId);
   const docSnap = await getDoc(userUsageRef);
   
   if (docSnap.exists()) {
     const data = docSnap.data();
+    console.log("Found usage document:", data);
     return {
       ...data,
       lastUpdated: data.lastUpdated?.toDate()
     } as UserUsage;
   }
   
+  console.log("No usage document found for user:", userId);
   return null;
 }
 
