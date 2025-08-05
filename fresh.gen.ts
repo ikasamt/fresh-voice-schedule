@@ -29,6 +29,7 @@ import * as $QuickEditDialog from "./islands/QuickEditDialog.tsx";
 import * as $ScheduleItemCatalog from "./islands/ScheduleItemCatalog.tsx";
 import * as $StoryRenderer from "./islands/StoryRenderer.tsx";
 import * as $TimelineScreen from "./islands/TimelineScreen.tsx";
+import * as $UsageDisplay from "./islands/UsageDisplay.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -65,6 +66,7 @@ const manifest = {
     "./islands/ScheduleItemCatalog.tsx": $ScheduleItemCatalog,
     "./islands/StoryRenderer.tsx": $StoryRenderer,
     "./islands/TimelineScreen.tsx": $TimelineScreen,
+    "./islands/UsageDisplay.tsx": $UsageDisplay,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;

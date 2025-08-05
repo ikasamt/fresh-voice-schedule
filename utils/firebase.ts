@@ -1,5 +1,6 @@
 // Firebase SDK for Web
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { trackFirestoreUsage } from "./usage-tracking.ts";
 import { 
   getAuth, 
   signInWithPopup, 
@@ -86,7 +87,7 @@ export function subscribeToSchedules(
     orderBy("scheduledDate", "asc")
   );
 
-  return onSnapshot(q, (snapshot: QuerySnapshot<DocumentData>) => {
+  return onSnapshot(q, async (snapshot: QuerySnapshot<DocumentData>) => {
     const schedules = snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
@@ -95,16 +96,26 @@ export function subscribeToSchedules(
       updatedAt: doc.data().updatedAt?.toDate(),
     })) as ScheduleItem[];
     
+    // 読み取り操作を記録（ドキュメント数分）
+    if (snapshot.docs.length > 0) {
+      await trackFirestoreUsage(userId, 'read', snapshot.docs.length);
+    }
+    
     callback(schedules);
   });
 }
 
 export async function addSchedule(schedule: Omit<ScheduleItem, "id" | "createdAt" | "updatedAt">) {
-  return await addDoc(collection(db, "schedules"), {
+  const result = await addDoc(collection(db, "schedules"), {
     ...schedule,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
+  
+  // 書き込み操作を記録
+  await trackFirestoreUsage(schedule.userId, 'write');
+  
+  return result;
 }
 
 export async function updateSchedule(id: string, updates: Partial<ScheduleItem>) {

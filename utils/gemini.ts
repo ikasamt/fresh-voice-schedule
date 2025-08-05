@@ -1,3 +1,5 @@
+import { trackGeminiUsage } from "./usage-tracking.ts";
+
 // Gemini API client
 const GEMINI_API_KEY = "AIzaSyAO1CfzhpRHe1-SrNo70XBlqJiFfnnNAWA";
 const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
@@ -11,7 +13,7 @@ export interface ParsedSchedule {
   subtasks?: ParsedSchedule[]; // サブタスクの配列
 }
 
-export async function parseScheduleText(text: string): Promise<ParsedSchedule> {
+export async function parseScheduleText(text: string, userId?: string): Promise<ParsedSchedule> {
   const prompt = `
 あなたはスケジュール管理アシスタントです。
 ユーザーの入力テキストから以下の情報を抽出してください：
@@ -79,6 +81,11 @@ export async function parseScheduleText(text: string): Promise<ParsedSchedule> {
       throw new Error(`Gemini API error: ${response.statusText}`);
     }
 
+    // API使用量を記録
+    if (userId) {
+      await trackGeminiUsage(userId);
+    }
+
     const data = await response.json();
     const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
     
@@ -114,7 +121,7 @@ export async function parseScheduleText(text: string): Promise<ParsedSchedule> {
   }
 }
 
-export async function parseScheduleFromImage(imageBase64: string): Promise<ParsedSchedule> {
+export async function parseScheduleFromImage(imageBase64: string, userId?: string): Promise<ParsedSchedule> {
   const prompt = `
 この画像からイベントや予定に関する情報を読み取ってください。
 特に以下の情報を抽出してください：
@@ -157,10 +164,15 @@ export async function parseScheduleFromImage(imageBase64: string): Promise<Parse
       throw new Error(`Gemini Vision API error: ${response.statusText}`);
     }
 
+    // API使用量を記録
+    if (userId) {
+      await trackGeminiUsage(userId);
+    }
+
     const data = await response.json();
     const extractedText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
     
-    // Parse the extracted text as schedule
+    // Parse the extracted text as schedule (userIdは既に記録済みなので渡さない)
     return await parseScheduleText(extractedText);
   } catch (error) {
     console.error("Gemini Vision API error:", error);

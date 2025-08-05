@@ -14,6 +14,7 @@ import AnimatedScheduleItem from "../components/AnimatedScheduleItem.tsx";
 import DraggableScheduleItem from "../components/DraggableScheduleItem.tsx";
 import AddScheduleModal from "./AddScheduleModal.tsx";
 import QuickEditDialog from "./QuickEditDialog.tsx";
+import UsageDisplay from "./UsageDisplay.tsx";
 
 interface Props {
   user: User;
@@ -120,8 +121,8 @@ export default function TimelineScreen({ user }: Props) {
   const handleAddSchedule = async (text: string, imageData?: string) => {
     try {
       const parsed = imageData 
-        ? await parseScheduleFromImage(imageData)
-        : await parseScheduleText(text);
+        ? await parseScheduleFromImage(imageData, user.uid)
+        : await parseScheduleText(text, user.uid);
 
       // 親タスクを作成
       const parentResult = await addSchedule({
@@ -244,6 +245,7 @@ export default function TimelineScreen({ user }: Props) {
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </button>
+              <UsageDisplay userId={user.uid} />
               <button
                 onClick={handleSignOut}
                 class="p-2 text-gray-400 hover:text-gray-600 rounded-lg transition-colors"

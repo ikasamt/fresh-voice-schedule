@@ -21,5 +21,16 @@ service cloud.firestore {
       allow delete: if request.auth != null && 
                        request.auth.uid == resource.data.userId;
     }
+    
+    // user_usageコレクション: ユーザーごとの使用量追跡
+    match /user_usage/{userId} {
+      // 読み取り: 自分の使用量のみ
+      allow read: if request.auth != null && 
+                     request.auth.uid == userId;
+      
+      // 作成・更新: 自分の使用量のみ（サーバーサイドで更新されるため、基本的には読み取り専用）
+      allow create, update: if request.auth != null && 
+                               request.auth.uid == userId;
+    }
   }
 }
