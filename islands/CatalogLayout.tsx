@@ -1,22 +1,10 @@
 import { ComponentChildren } from "preact";
+import { defaultMenuItems, type MenuItem } from "../utils/catalog-menu-items.ts";
 
 interface Props {
   children: ComponentChildren;
   currentPath: string;
 }
-
-interface MenuItem {
-  label: string;
-  path: string;
-  category?: string;
-}
-
-// 基本メニュー項目
-const baseMenuItems: MenuItem[] = [
-  { label: "Overview", path: "/catalog", category: "Getting Started" },
-  { label: "Buttons", path: "/catalog/buttons", category: "Components" },
-  { label: "Time Display", path: "/catalog/time-display", category: "Components" },
-];
 
 // 生成されたメニュー項目を動的にインポート
 let generatedMenuItems: MenuItem[] = [];
@@ -28,7 +16,7 @@ try {
 }
 
 // 重複を除外してメニュー項目をマージ
-const menuItems = [...baseMenuItems];
+const menuItems = [...defaultMenuItems];
 generatedMenuItems.forEach(item => {
   if (!menuItems.some(existing => existing.path === item.path)) {
     menuItems.push(item);
