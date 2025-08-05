@@ -25,26 +25,34 @@ export async function parseScheduleText(text: string): Promise<ParsedSchedule> {
 入力テキスト: "${text}"
 現在時刻: ${new Date().toISOString()}
 
-以下のJSON形式で返してください（コードブロックなし、JSONのみ）：
+必ずJSONフォーマットで返してください。コードブロックやバッククォートは使わないでください。
+
+例1: 「買い物に行く: 1. 牛乳を買う 2. パンを買う」の場合
 {
-  "title": "タスクのタイトル",
-  "scheduledDate": "ISO8601形式の日時（例：2024-01-20T15:00:00）またはnull",
-  "estimatedDurationMinutes": 所要時間（分）またはnull,
-  "location": "場所名またはnull",
+  "title": "買い物",
+  "scheduledDate": null,
+  "estimatedDurationMinutes": null,
+  "location": null,
   "subtasks": [
-    {
-      "title": "サブタスク1",
-      "scheduledDate": "ISO8601形式の日時またはnull",
-      "estimatedDurationMinutes": 所要時間（分）またはnull,
-      "location": "場所名またはnull"
-    }
+    {"title": "牛乳を買う", "scheduledDate": null, "estimatedDurationMinutes": null, "location": null},
+    {"title": "パンを買う", "scheduledDate": null, "estimatedDurationMinutes": null, "location": null}
   ]
 }
 
-注意：
-- 箇条書き、番号付きリスト、「〜して〜する」のような複数ステップがある場合は、subtasksに分解してください
-- サブタスクがない場合はsubtasksは空配列[]にしてください
-- 親タスクは全体を表す抽象的なタイトルにしてください
+例2: 「明日15時に会議」の場合（単一タスク）
+{
+  "title": "会議",
+  "scheduledDate": "2024-XX-XXT15:00:00",
+  "estimatedDurationMinutes": null,
+  "location": null,
+  "subtasks": []
+}
+
+重要:
+- 複数の行動やステップが含まれる場合は必ずsubtasksに分解
+- 「〜して〜する」「〜、〜」のような並列表現も分解
+- 番号付きリスト（1. 2. など）や箇条書き（・など）も分解
+- 単一の行動の場合のみsubtasksは空配列
 `;
 
   try {
@@ -62,7 +70,7 @@ export async function parseScheduleText(text: string): Promise<ParsedSchedule> {
         generationConfig: {
           temperature: 0.7,
           topP: 0.95,
-          maxOutputTokens: 256,
+          maxOutputTokens: 1024,
         }
       }),
     });
@@ -73,6 +81,9 @@ export async function parseScheduleText(text: string): Promise<ParsedSchedule> {
 
     const data = await response.json();
     const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+    
+    // デバッグ用ログ
+    console.log("Gemini response:", responseText);
     
     // Parse JSON response
     const parsed = parseJsonResponse(responseText);
