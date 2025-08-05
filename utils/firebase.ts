@@ -97,9 +97,10 @@ export function subscribeToSchedules(
     })) as ScheduleItem[];
     
     // 読み取り操作を記録（ドキュメント数分）
-    if (snapshot.docs.length > 0) {
-      await trackFirestoreUsage(userId, 'read', snapshot.docs.length);
-    }
+    // TODO: サーバーサイドで実装する必要がある
+    // if (snapshot.docs.length > 0) {
+    //   await trackFirestoreUsage(userId, 'read', snapshot.docs.length);
+    // }
     
     callback(schedules);
   });
@@ -113,7 +114,8 @@ export async function addSchedule(schedule: Omit<ScheduleItem, "id" | "createdAt
   });
   
   // 書き込み操作を記録
-  await trackFirestoreUsage(schedule.userId, 'write');
+  // TODO: サーバーサイドで実装する必要がある
+  // await trackFirestoreUsage(schedule.userId, 'write');
   
   return result;
 }
