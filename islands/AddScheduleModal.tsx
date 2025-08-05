@@ -43,8 +43,21 @@ export default function AddScheduleModal({ onClose, onSubmit }: Props) {
     if (!text.trim() && !selectedImage) return;
 
     setIsProcessing(true);
+    
+    // タイムアウトを設定（15秒）
+    const timeoutId = setTimeout(() => {
+      console.error("処理がタイムアウトしました");
+      setIsProcessing(false);
+      alert("処理がタイムアウトしました。もう一度お試しください。");
+    }, 15000);
+    
     try {
       await onSubmit(text, selectedImage || undefined);
+      clearTimeout(timeoutId);
+    } catch (error) {
+      clearTimeout(timeoutId);
+      console.error("予定の追加中にエラーが発生しました:", error);
+      alert("エラーが発生しました。もう一度お試しください。");
     } finally {
       setIsProcessing(false);
     }

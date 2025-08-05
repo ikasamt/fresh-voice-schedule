@@ -58,11 +58,16 @@ export async function parseScheduleText(text: string, userId?: string): Promise<
 `;
 
   try {
+    // 10秒のタイムアウトを設定
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    
     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
+      signal: controller.signal,
       body: JSON.stringify({
         contents: [{
           parts: [{
@@ -76,6 +81,8 @@ export async function parseScheduleText(text: string, userId?: string): Promise<
         }
       }),
     });
+    
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       throw new Error(`Gemini API error: ${response.statusText}`);
@@ -109,14 +116,22 @@ export async function parseScheduleText(text: string, userId?: string): Promise<
         originalText: sub.title,
       })) : [],
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Gemini API error:", error);
+    
+    // タイムアウトエラーの場合
+    if (error.name === 'AbortError') {
+      throw new Error('Gemini APIへの接続がタイムアウトしました。ネットワーク接続を確認してください。');
+    }
+    
+    // その他のエラーの場合はフォールバック
     return {
       title: text,
       scheduledDate: null,
       estimatedDuration: null,
       location: null,
       originalText: text,
+      subtasks: [],
     };
   }
 }
@@ -135,11 +150,16 @@ export async function parseScheduleFromImage(imageBase64: string, userId?: strin
 `;
 
   try {
+    // 10秒のタイムアウトを設定
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    
     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
+      signal: controller.signal,
       body: JSON.stringify({
         contents: [{
           parts: [
@@ -159,6 +179,8 @@ export async function parseScheduleFromImage(imageBase64: string, userId?: strin
         }
       }),
     });
+    
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       throw new Error(`Gemini Vision API error: ${response.statusText}`);
@@ -174,8 +196,14 @@ export async function parseScheduleFromImage(imageBase64: string, userId?: strin
     
     // Parse the extracted text as schedule (userIdは既に記録済みなので渡さない)
     return await parseScheduleText(extractedText);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Gemini Vision API error:", error);
+    
+    // タイムアウトエラーの場合
+    if (error.name === 'AbortError') {
+      throw new Error('画像処理がタイムアウトしました。画像サイズを小さくするか、ネットワーク接続を確認してください。');
+    }
+    
     throw error;
   }
 }
