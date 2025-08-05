@@ -8,20 +8,26 @@ import * as $api_joke from "./routes/api/joke.ts";
 import * as $catalog_add_modal from "./routes/catalog/add-modal.tsx";
 import * as $catalog_buttons from "./routes/catalog/buttons.tsx";
 import * as $catalog_edit_dialog from "./routes/catalog/edit-dialog.tsx";
+import * as $catalog_generated_addschedulemodal from "./routes/catalog/generated/addschedulemodal.tsx";
+import * as $catalog_generated_animatedscheduleitem from "./routes/catalog/generated/animatedscheduleitem.tsx";
+import * as $catalog_generated_quickeditdialog from "./routes/catalog/generated/quickeditdialog.tsx";
 import * as $catalog_index from "./routes/catalog/index.tsx";
 import * as $catalog_schedule_item from "./routes/catalog/schedule-item.tsx";
 import * as $catalog_time_display from "./routes/catalog/time-display.tsx";
 import * as $greet_name_ from "./routes/greet/[name].tsx";
 import * as $index from "./routes/index.tsx";
 import * as $AddModalCatalog from "./islands/AddModalCatalog.tsx";
+import * as $AddScheduleModal_stories from "./islands/AddScheduleModal.stories.tsx";
 import * as $AddScheduleModal from "./islands/AddScheduleModal.tsx";
 import * as $App from "./islands/App.tsx";
 import * as $CatalogLayout from "./islands/CatalogLayout.tsx";
 import * as $Counter from "./islands/Counter.tsx";
 import * as $EditDialogCatalog from "./islands/EditDialogCatalog.tsx";
 import * as $LoginScreen from "./islands/LoginScreen.tsx";
+import * as $QuickEditDialog_stories from "./islands/QuickEditDialog.stories.tsx";
 import * as $QuickEditDialog from "./islands/QuickEditDialog.tsx";
 import * as $ScheduleItemCatalog from "./islands/ScheduleItemCatalog.tsx";
+import * as $StoryRenderer from "./islands/StoryRenderer.tsx";
 import * as $TimelineScreen from "./islands/TimelineScreen.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
@@ -33,6 +39,12 @@ const manifest = {
     "./routes/catalog/add-modal.tsx": $catalog_add_modal,
     "./routes/catalog/buttons.tsx": $catalog_buttons,
     "./routes/catalog/edit-dialog.tsx": $catalog_edit_dialog,
+    "./routes/catalog/generated/addschedulemodal.tsx":
+      $catalog_generated_addschedulemodal,
+    "./routes/catalog/generated/animatedscheduleitem.tsx":
+      $catalog_generated_animatedscheduleitem,
+    "./routes/catalog/generated/quickeditdialog.tsx":
+      $catalog_generated_quickeditdialog,
     "./routes/catalog/index.tsx": $catalog_index,
     "./routes/catalog/schedule-item.tsx": $catalog_schedule_item,
     "./routes/catalog/time-display.tsx": $catalog_time_display,
@@ -41,14 +53,17 @@ const manifest = {
   },
   islands: {
     "./islands/AddModalCatalog.tsx": $AddModalCatalog,
+    "./islands/AddScheduleModal.stories.tsx": $AddScheduleModal_stories,
     "./islands/AddScheduleModal.tsx": $AddScheduleModal,
     "./islands/App.tsx": $App,
     "./islands/CatalogLayout.tsx": $CatalogLayout,
     "./islands/Counter.tsx": $Counter,
     "./islands/EditDialogCatalog.tsx": $EditDialogCatalog,
     "./islands/LoginScreen.tsx": $LoginScreen,
+    "./islands/QuickEditDialog.stories.tsx": $QuickEditDialog_stories,
     "./islands/QuickEditDialog.tsx": $QuickEditDialog,
     "./islands/ScheduleItemCatalog.tsx": $ScheduleItemCatalog,
+    "./islands/StoryRenderer.tsx": $StoryRenderer,
     "./islands/TimelineScreen.tsx": $TimelineScreen,
   },
   baseUrl: import.meta.url,

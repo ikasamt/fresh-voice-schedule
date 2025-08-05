@@ -7,6 +7,7 @@ interface Props {
   onToggleComplete: () => void;
   onEdit: (field: "title" | "date") => void;
   onDelete: () => void;
+  shortcutNumber?: number;
 }
 
 export default function AnimatedScheduleItem({ 
@@ -14,7 +15,8 @@ export default function AnimatedScheduleItem({
   showRelativeTime = false,
   onToggleComplete, 
   onEdit,
-  onDelete
+  onDelete,
+  shortcutNumber
 }: Props) {
   const [isCompleting, setIsCompleting] = useState(false);
   const [, setRefresh] = useState(0);
@@ -114,7 +116,7 @@ export default function AnimatedScheduleItem({
         {/* Checkbox */}
         <button
           onClick={handleCheckClick}
-          class="flex-shrink-0 mt-0.5"
+          class="flex-shrink-0 mt-0.5 relative"
           disabled={isCompleting}
         >
           {(schedule.isCompleted || isCompleting) ? (
@@ -123,6 +125,12 @@ export default function AnimatedScheduleItem({
             </svg>
           ) : (
             <div class="w-6 h-6 border-2 border-gray-300 rounded-full hover:border-blue-400 transition-colors"></div>
+          )}
+          {/* ショートカット番号表示 */}
+          {shortcutNumber && (
+            <div class="absolute -bottom-1 -left-1 w-4 h-4 bg-red-500 text-white text-xs font-bold rounded-sm flex items-center justify-center">
+              {shortcutNumber}
+            </div>
           )}
         </button>
 

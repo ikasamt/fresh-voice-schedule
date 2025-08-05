@@ -9,3 +9,6 @@
 _fresh/
 # npm dependencies
 node_modules/
+# Generated catalog files
+utils/catalog-generated.ts
+routes/catalog/generated/

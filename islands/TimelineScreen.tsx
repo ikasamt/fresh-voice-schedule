@@ -26,6 +26,7 @@ export default function TimelineScreen({ user }: Props) {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingSchedule, setEditingSchedule] = useState<ScheduleItem | null>(null);
   const [editingField, setEditingField] = useState<"title" | "date" | null>(null);
+  const [isCommandPressed, setIsCommandPressed] = useState(false);
 
   useEffect(() => {
     const unsubscribe = subscribeToSchedules(user.uid, (data) => {
@@ -37,6 +38,45 @@ export default function TimelineScreen({ user }: Props) {
   }, [user.uid]);
 
   const filteredSchedules = schedules.filter(s => showCompleted || !s.isCompleted);
+
+  // Commandキーの検出
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey) {
+        setIsCommandPressed(true);
+      }
+      
+      // Command + 数字キーでアクション実行
+      if ((e.metaKey || e.ctrlKey) && e.key >= '1' && e.key <= '9') {
+        e.preventDefault();
+        const index = parseInt(e.key) - 1;
+        const targetSchedule = filteredSchedules[index];
+        if (targetSchedule && !targetSchedule.isCompleted) {
+          handleToggleComplete(targetSchedule);
+        }
+      }
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (!e.metaKey && !e.ctrlKey) {
+        setIsCommandPressed(false);
+      }
+    };
+
+    const handleBlur = () => {
+      setIsCommandPressed(false);
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('blur', handleBlur);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('blur', handleBlur);
+    };
+  }, [filteredSchedules]);
 
   const handleToggleComplete = async (schedule: ScheduleItem) => {
     if (schedule.id) {
@@ -157,7 +197,7 @@ export default function TimelineScreen({ user }: Props) {
           </div>
         ) : (
           <div class="space-y-3">
-            {filteredSchedules.map((schedule) => (
+            {filteredSchedules.map((schedule, index) => (
               <AnimatedScheduleItem
                 key={schedule.id}
                 schedule={schedule}
@@ -165,6 +205,7 @@ export default function TimelineScreen({ user }: Props) {
                 onToggleComplete={() => handleToggleComplete(schedule)}
                 onEdit={(field) => handleEdit(schedule, field)}
                 onDelete={() => handleDelete(schedule)}
+                shortcutNumber={isCommandPressed && !schedule.isCompleted && index < 9 ? index + 1 : undefined}
               />
             ))}
           </div>

@@ -11,14 +11,29 @@ interface MenuItem {
   category?: string;
 }
 
-const menuItems: MenuItem[] = [
+// 基本メニュー項目
+const baseMenuItems: MenuItem[] = [
   { label: "Overview", path: "/catalog", category: "Getting Started" },
-  { label: "AnimatedScheduleItem", path: "/catalog/schedule-item", category: "Components" },
-  { label: "AddScheduleModal", path: "/catalog/add-modal", category: "Components" },
-  { label: "QuickEditDialog", path: "/catalog/edit-dialog", category: "Components" },
   { label: "Buttons", path: "/catalog/buttons", category: "Components" },
   { label: "Time Display", path: "/catalog/time-display", category: "Components" },
 ];
+
+// 生成されたメニュー項目を動的にインポート
+let generatedMenuItems: MenuItem[] = [];
+try {
+  const module = await import("../utils/catalog-generated.ts");
+  generatedMenuItems = module.generatedMenuItems || [];
+} catch {
+  // ファイルが存在しない場合は空配列
+}
+
+// 重複を除外してメニュー項目をマージ
+const menuItems = [...baseMenuItems];
+generatedMenuItems.forEach(item => {
+  if (!menuItems.some(existing => existing.path === item.path)) {
+    menuItems.push(item);
+  }
+});
 
 export default function CatalogLayout({ children, currentPath }: Props) {
   const categories = [...new Set(menuItems.map(item => item.category))].filter(Boolean);
